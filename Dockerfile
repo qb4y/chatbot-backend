@@ -7,12 +7,13 @@ RUN npm install -g pnpm
 # Crear y definir el directorio de trabajo
 WORKDIR /app
 
-# Copiar los archivos necesarios
-COPY package.json ./
-COPY pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+# Copiar los archivos de configuración antes de instalar dependencias
+COPY package.json pnpm-lock.yaml ./
 
-# Copiar el código del backend
+# Instalar dependencias y depurar errores
+RUN pnpm install --frozen-lockfile && pnpm list
+
+# Copiar el código del backend después de instalar dependencias
 COPY . .
 
 # Exponer el puerto donde se ejecutará NestJS
