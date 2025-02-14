@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatbot-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: chatbot-backend
+  template:
+    metadata:
+      labels:
+        app: chatbot-backend
+    spec:
+      containers:
+        - name: chatbot-backend
+          image: chatbot-backend:latest
+          command: ['pnpm', 'start']
+          ports:
+            - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatbot-backend-service
+spec:
+  selector:
+    app: chatbot-backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: LoadBalancer
