@@ -5,6 +5,8 @@ import {
   Res,
   HttpException,
   HttpStatus,
+  Get,
+  Query,
 } from '@nestjs/common';
 import { Response } from 'express';
 import axios, { AxiosResponse } from 'axios';
@@ -45,6 +47,25 @@ interface WebhookRequest {
 
 @Controller('api/webhook')
 export class WebhookController {
+  @Get()
+  verifyWebhook(
+    @Query('hub.mode') mode: string,
+    @Query('hub.challenge') challenge: string,
+    @Query('hub.verify_token') token: string,
+    @Res() res: Response,
+  ) {
+    const VERIFY_TOKEN =
+      process.env.WHATSAPP_VERIFY_TOKEN || 'mi_token_secreto';
+
+    if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+      console.log('✅ Webhook verificado correctamente.');
+      return res.status(HttpStatus.OK).send(challenge); // Meta espera este challenge
+    } else {
+      console.warn('⚠️ Verificación fallida. Token incorrecto.');
+      return res.status(HttpStatus.FORBIDDEN).send('Verificación fallida.');
+    }
+  }
+
   private readonly WHATSAPP_API_URL =
     'https://graph.facebook.com/v22.0/528063353731783/messages'; // 📌 Reemplaza con tu `phone_number_id`
   private readonly ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN || ''; // 📌 Defínelo en `.env`
