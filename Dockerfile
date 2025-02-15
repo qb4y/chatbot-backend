@@ -1,23 +1,25 @@
-# Usar la última versión LTS de Node.js
 FROM node:22
 
 # Instalar pnpm globalmente
 RUN npm install -g pnpm
 
-# Crear y definir el directorio de trabajo
 WORKDIR /app
 
-# Copiar los archivos de configuración antes de instalar dependencias
+# Copiar solo archivos de configuración para aprovechar la caché
 COPY package.json pnpm-lock.yaml ./
 
-# Instalar dependencias y depurar errores
-RUN pnpm install --frozen-lockfile && pnpm list
+# Instalar dependencias sin ejecutar pnpm list
+RUN pnpm install --frozen-lockfile
 
-# Copiar el código del backend después de instalar dependencias
+# Copiar el código después de instalar dependencias
 COPY . .
 
-# Exponer el puerto donde se ejecutará NestJS
+# Exponer el puerto de la aplicación
 EXPOSE 3000
 
-# Comando para ejecutar la aplicación
+# Crear un usuario sin privilegios
+RUN useradd --create-home appuser
+USER appuser
+
+# Ejecutar la aplicación
 CMD ["pnpm", "start"]

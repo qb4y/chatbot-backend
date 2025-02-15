@@ -15,9 +15,13 @@ spec:
       containers:
         - name: chatbot-backend
           image: chatbot-backend:latest
-          command: ['pnpm', 'start']
-          ports:
-            - containerPort: 3000
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
 ---
 apiVersion: v1
 kind: Service

@@ -12,17 +12,20 @@ export class ProcessMessageUseCase {
    * Procesa un mensaje entrante de WhatsApp y responde automáticamente.
    */
   async execute(message: WhatsAppMessage): Promise<void> {
-    if (!message.from || !message.text?.body) {
-      this.logger.warn('⚠️ Mensaje recibido sin contenido o remitente.');
-      throw new Error('Mensaje incompleto.');
+    try {
+      if (!message.from || !message.text?.body) {
+        this.logger.warn('⚠️ Mensaje recibido sin contenido o remitente.');
+        throw new Error('Mensaje incompleto.');
+      }
+
+      this.logger.log(`📨 Mensaje de ${message.from}: ${message.text.body}`);
+
+      await this.whatsappService.sendMessage(
+        message.from,
+        `Hola! Recibí tu mensaje: "${message.text.body}"`,
+      );
+    } catch (error) {
+      this.logger.error('❌ Error procesando mensaje:', error);
     }
-
-    this.logger.log(`📨 Mensaje de ${message.from}: ${message.text.body}`);
-
-    // 📌 Aquí se usa WhatsAppRepository
-    await this.whatsappService.sendMessage(
-      message.from,
-      `Hola! Recibí tu mensaje: "${message.text.body}"`,
-    );
   }
 }

@@ -10,12 +10,16 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { Logger } from '@nestjs/common';
 import { HandleWebhookUseCase } from 'src/application/use-cases/handle-webhook.use-case';
 import { WebhookRequestDto } from '../dtos/webhook.dto';
 
 @Controller('api/webhook')
 export class WebhookController {
-  constructor(private readonly handleWebhookUseCase: HandleWebhookUseCase) {}
+  constructor(
+    private readonly handleWebhookUseCase: HandleWebhookUseCase,
+    private readonly logger = new Logger(WebhookController.name),
+  ) {}
 
   @Get()
   verifyWebhook(
@@ -31,7 +35,7 @@ export class WebhookController {
       console.log('✅ Webhook verificado correctamente.');
       return res.status(HttpStatus.OK).send(challenge);
     } else {
-      console.warn('⚠️ Verificación fallida. Token incorrecto.');
+      this.logger.warn('⚠️ Verificación fallida. Token incorrecto.');
       return res.status(HttpStatus.FORBIDDEN).send('Verificación fallida.');
     }
   }
@@ -39,7 +43,7 @@ export class WebhookController {
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
   async receiveMessage(@Body() body: WebhookRequestDto, @Res() res: Response) {
-    console.log('📩 Webhook recibido:', JSON.stringify(body, null, 2));
+    this.logger.log(`📩 Webhook recibido: ${JSON.stringify(body)}`);
 
     try {
       await this.handleWebhookUseCase.execute(body);
