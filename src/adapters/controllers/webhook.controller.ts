@@ -6,14 +6,16 @@ import {
   HttpStatus,
   Get,
   Query,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { WebhookService } from '../../infrastructure/webhook/services/webhook.service';
-import { WebhookRequest } from '../../domain/interfaces/webhook.interface';
+import { HandleWebhookUseCase } from 'src/application/use-cases/handle-webhook.use-case';
+import { WebhookRequestDto } from '../dtos/webhook.dto';
 
 @Controller('api/webhook')
 export class WebhookController {
-  constructor(private readonly webhookService: WebhookService) {}
+  constructor(private readonly handleWebhookUseCase: HandleWebhookUseCase) {}
 
   @Get()
   verifyWebhook(
@@ -35,11 +37,12 @@ export class WebhookController {
   }
 
   @Post()
-  async receiveMessage(@Body() body: WebhookRequest, @Res() res: Response) {
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+  async receiveMessage(@Body() body: WebhookRequestDto, @Res() res: Response) {
     console.log('📩 Webhook recibido:', JSON.stringify(body, null, 2));
 
     try {
-      await this.webhookService.handleWebhookEvent(body);
+      await this.handleWebhookUseCase.execute(body);
       return res.status(HttpStatus.OK).send('EVENT_RECEIVED');
     } catch (error) {
       console.error('❌ Error procesando el webhook:', error);

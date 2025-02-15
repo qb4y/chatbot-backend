@@ -19,7 +19,7 @@ export class ProcessMessageUseCase {
 
     this.logger.log(`📨 Mensaje de ${message.from}: ${message.text.body}`);
 
-    // 📌 Enviar respuesta automática usando WhatsAppService
+    // 📌 Aquí se usa WhatsAppRepository
     await this.whatsappService.sendMessage(
       message.from,
       `Hola! Recibí tu mensaje: "${message.text.body}"`,

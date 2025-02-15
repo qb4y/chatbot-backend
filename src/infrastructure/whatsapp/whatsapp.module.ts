@@ -3,6 +3,6 @@ import { WhatsAppService } from './services/whatsapp.service';
 
 @Module({
   providers: [WhatsAppService],
-  exports: [WhatsAppService], // 👈 Exportamos para que Application pueda usarlo
+  exports: [WhatsAppService], // Exportamos para que WebhookModule pueda usarlo
 })
 export class WhatsAppModule {}

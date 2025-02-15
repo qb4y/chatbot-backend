@@ -1,12 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { WhatsAppResponse } from '../../../domain/interfaces/whatsapp-response.interface';
+import { WhatsAppRepository } from '../../../domain/repositories/whatsapp.repository';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
-import axios from 'axios';
 
 @Injectable()
-export class WhatsAppService {
+export class WhatsAppService implements WhatsAppRepository {
   private readonly logger = new Logger(WhatsAppService.name);
   private readonly WHATSAPP_API_URL: string;
   private readonly ACCESS_TOKEN: string;
@@ -22,9 +21,6 @@ export class WhatsAppService {
     );
   }
 
-  /**
-   * Envía un mensaje a través de la API de WhatsApp.
-   */
   async sendMessage(to: string, text: string): Promise<void> {
     const payload = {
       messaging_product: 'whatsapp',
@@ -33,32 +29,18 @@ export class WhatsAppService {
     };
 
     try {
-      const response = await firstValueFrom(
-        this.httpService.post<WhatsAppResponse>(
-          this.WHATSAPP_API_URL,
-          payload,
-          {
-            headers: {
-              Authorization: `Bearer ${this.ACCESS_TOKEN}`,
-              'Content-Type': 'application/json',
-            },
+      await firstValueFrom(
+        this.httpService.post(this.WHATSAPP_API_URL, payload, {
+          headers: {
+            Authorization: `Bearer ${this.ACCESS_TOKEN}`,
+            'Content-Type': 'application/json',
           },
-        ),
+        }),
       );
 
-      this.logger.log(
-        `✅ Mensaje enviado a ${to}: ${response.data?.messages?.[0]?.id || 'Sin ID'}`,
-      );
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        this.logger.error(
-          '❌ Error enviando mensaje:',
-          error.response?.data || error.message,
-        );
-      } else {
-        this.logger.error('❌ Error desconocido:', String(error));
-      }
-
+      this.logger.log(`✅ Mensaje enviado a ${to}`);
+    } catch (error: any) {
+      this.logger.error('❌ Error enviando mensaje:', (error as Error).message);
       throw new Error('Error al enviar mensaje');
     }
   }
