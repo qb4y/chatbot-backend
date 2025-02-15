@@ -1,14 +1,3 @@
-export interface WhatsAppMessage {
-  from: string;
-  id: string;
-  timestamp: string;
-  text?: { body: string };
-  type: string;
-}
+import { WhatsAppMessage, WhatsAppStatus } from './common.interface';
 
-export interface WhatsAppStatus {
-  id: string;
-  status: string;
-  timestamp: string;
-  recipient_id: string;
-}
+export { WhatsAppMessage, WhatsAppStatus };
