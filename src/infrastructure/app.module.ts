@@ -1,14 +1,15 @@
-import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { HandleWebhookUseCase } from 'src/application/use-cases/handle-webhook.use-case';
-import { WebhookController } from '../adapters/controllers/webhook.controller';
-import { WebhookService } from './webhook/services/webhook.service';
-import { WhatsAppService } from './whatsapp/services/whatsapp.service';
+import { HttpModule } from '@nestjs/axios';
+import { WebhookModule } from './webhook/webhook.module';
+import { WhatsAppModule } from './whatsapp/whatsapp.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), HttpModule],
-  controllers: [WebhookController],
-  providers: [WebhookService, WhatsAppService, HandleWebhookUseCase],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    HttpModule,
+    WebhookModule, // Asegurar que esté aquí
+    WhatsAppModule,
+  ],
 })
 export class AppModule {}

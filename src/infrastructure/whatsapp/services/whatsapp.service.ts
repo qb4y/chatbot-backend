@@ -11,7 +11,7 @@ export class WhatsAppService implements WhatsAppRepository {
   private readonly ACCESS_TOKEN: string;
 
   constructor(
-    private readonly httpService: HttpService,
+    private readonly httpService: HttpService, // Asegurar que esto esté presente
     private readonly configService: ConfigService,
   ) {
     this.WHATSAPP_API_URL = `https://graph.facebook.com/v22.0/${this.configService.get<string>('PHONE_NUMBER_ID')}/messages`;
