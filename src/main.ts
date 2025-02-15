@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { AppModule } from './infrastructure/app.module';
 import * as dotenv from 'dotenv';
 
 dotenv.config(); // Cargar variables de entorno desde .env
